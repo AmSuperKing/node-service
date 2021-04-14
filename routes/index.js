@@ -7,7 +7,7 @@ router.use(cors());
 var mysql_connection = require('../sql/sql');
 var connection = mysql_connection.mysql_connection
 
-/* Home page api. */
+/* Index page api. */
 
 // 登录
 router.post('/userLogin', function(req, res, next) {
