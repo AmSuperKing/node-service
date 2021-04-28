@@ -77,7 +77,7 @@ router.post('/getUserName', (req, res, next) => {
 // 注册
 router.post('/userRegister', (req, res, next) => {
   // usertable为表名
-  const inset_sql =`INSERT INTO usertable(user_id,password,user_name)
+  const inset_sql =`INSERT IGNORE INTO usertable(user_id,password,user_name)
   VALUES ('${req.body.account}','${req.body.password}','${req.body.account}')`;
   console.log('/api/userRegister 注册请求参数', req.body);
   console.log('/api/userRegister sql:', inset_sql);
@@ -85,18 +85,25 @@ router.post('/userRegister', (req, res, next) => {
   connection.query(inset_sql,(err, result) =>{
     if(err){
       console.log('/api/userRegister err.message:', err.message);
-      return res.status(200).json({
+      return res.status(500).json({
         code: 500,
-        message: '用户已存在'
+        message: '服务器错误'
       });
     } else {
-      console.log('insert result:', result);
-      res.status(200).json ({
-        code: 200,
-        data: [result],
-        message: '注册成功'
-      });
-      res.end();
+      console.log('insert result.affectedRows:', result.affectedRows);
+      if (result.affectedRows) {
+        res.status(200).json ({
+          code: 200,
+          message: '注册成功'
+        });
+        res.end();
+      } else {
+        res.status(200).json ({
+          code: 0,
+          message: '用户已存在'
+        });
+        res.end();
+      }
     };
   });
 });
@@ -136,7 +143,7 @@ router.post('/userHistory', (req, res, next) => {
 // 删除书签
 router.post('/delHistory', (req, res, next) => {
   const sql =`DELETE FROM history_list WHERE user_id = '${req.body.user_id}'
-  AND title = '${req.body.title}' AND time = '${req.body.time}'`;
+  AND history_title = '${req.body.history_title}' AND history_time = '${req.body.history_time}'`;
   console.log('/api/delHistory  获取用户书签列表请求参数', req.body);
   console.log('/api/delHistory  sql:', sql);
   console.log();
@@ -160,7 +167,7 @@ router.post('/delHistory', (req, res, next) => {
 
 // 获取文档推荐列表
 router.get('/getDocumentRec', (req, res, next) => {
-  const sql =`SELECT * FROM document_rec_list`;
+  const sql =`SELECT * FROM document_list ORDER BY RAND() LIMIT 6`;
   console.log('/api/getDocumentRec  sql:', sql);
   console.log();
   connection.query(sql,(err, results) =>{
@@ -191,7 +198,7 @@ router.get('/getDocumentRec', (req, res, next) => {
 
 // 获取视频推荐列表
 router.get('/getVideoRec', (req, res, next) => {
-  const sql =`SELECT * FROM video_rec_list`;
+  const sql =`SELECT * FROM video_list ORDER BY RAND() LIMIT 3`;
   console.log('/api/getVideoRec  sql:', sql);
   console.log();
   connection.query(sql,(err, results) =>{
@@ -222,7 +229,7 @@ router.get('/getVideoRec', (req, res, next) => {
 
 // 获取电子书推荐列表
 router.get('/getEbookRec', (req, res, next) => {
-  const sql =`SELECT * FROM ebook_rec_list`;
+  const sql =`SELECT * FROM ebook_list ORDER BY RAND() LIMIT 4`;
   console.log('/api/getEbookRec sql:', sql);
   console.log();
   connection.query(sql,(err, results) =>{
@@ -253,7 +260,7 @@ router.get('/getEbookRec', (req, res, next) => {
 
 // 获取课程推荐列表
 router.get('/getCourseRec', (req, res, next) => {
-  const sql =`SELECT * FROM course_rec_list`;
+  const sql =`SELECT * FROM course_list ORDER BY RAND() LIMIT 2`;
   console.log('/api/getCourseRec  sql:', sql);
   console.log();
   connection.query(sql,(err, results) =>{
@@ -284,9 +291,9 @@ router.get('/getCourseRec', (req, res, next) => {
 
 // 获取轮播推荐列表
 router.get('/getCarouselRec', (req, res, next) => {
-  const sql =`SELECT * FROM document_rec_list ORDER BY RAND() LIMIT 1;
-  SELECT * FROM video_rec_list ORDER BY RAND() LIMIT 1;
-  SELECT * FROM course_rec_list ORDER BY RAND() LIMIT 1;`;
+  const sql =`SELECT * FROM document_list ORDER BY RAND() LIMIT 1;
+  SELECT * FROM video_list ORDER BY RAND() LIMIT 1;
+  SELECT * FROM course_list ORDER BY RAND() LIMIT 1;`;
   console.log('/api/getCarouselRec sql:', sql);
   console.log();
   connection.query(sql,(err, results) =>{

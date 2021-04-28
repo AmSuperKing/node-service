@@ -5,8 +5,9 @@ var path = require('path'); // 路径模块
 var cookieParser = require('cookie-parser');
 var logger = require('morgan'); // 在控制台中，显示req请求的信息
 
-var indexRouter = require('./routes/index');
 var homeRouter = require('./routes/home');
+var indexRouter = require('./routes/index');
+var documentRouter = require('./routes/document');
 
 var app = express();
 
@@ -20,8 +21,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/',homeRouter);
-app.use('/api', indexRouter);
+app.use('/', homeRouter);
+app.use('/api', indexRouter, documentRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
