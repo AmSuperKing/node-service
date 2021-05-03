@@ -10,19 +10,19 @@ router.use(cors());
 var mysql_connection = require('../sql/sql');
 var connection = mysql_connection.mysql_connection
 
-/* Document page api. */
+/* Video page api. */
 
-// 获取文档数据列表
-router.post('/getDocumentList', (req, res, next) => {
+// 获取视频数据列表
+router.post('/getVideoList', (req, res, next) => {
   console.log(req.body)
-  const sql =`SELECT COUNT(*) FROM document_list;
-  SELECT * FROM document_list
+  const sql =`SELECT COUNT(*) FROM video_list;
+  SELECT * FROM video_list
   LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
-  console.log('/api/getDocumentList  sql:', sql);
+  console.log('/api/getVideoList  sql:', sql);
   console.log();
   connection.query(sql, (err, results) =>{
     if(err){
-      console.log('/api/getDocumentList  err:', err);
+      console.log('/api/getVideoList  err:', err);
       return res.status(500).json({
         code: 500,
         message: '获取数据失败'
@@ -52,17 +52,16 @@ router.post('/getDocumentList', (req, res, next) => {
   });
 });
 
-// 搜索文档
-router.get('/searchDocument', (req, res, next) => {
-  console.log('req.body:', req.body)
+// 获取视频信息
+router.get('/getVideoInfo', (req, res, next) => {
   console.log('req.query:', req.query);
-  let sql =`SELECT * FROM document_list
-  WHERE  LOWER(name) LIKE LOWER('%${req.query.search}%')`;
-  console.log('/api/searchDocument sql:', sql);
+  let sql =`SELECT * FROM video_list
+  WHERE path = '${req.query.search}'`;
+  console.log('/api/getVideoInfo sql:', sql);
   console.log();
   connection.query(sql, (err, results) =>{
     if(err){
-      console.log('/api/searchDocument err:', err);
+      console.log('/api/getVideoInfo err:', err);
       return res.status(500).json({
         code: 500,
         message: '获取数据失败'
@@ -86,16 +85,17 @@ router.get('/searchDocument', (req, res, next) => {
   });
 });
 
-// 获取文档信息
-router.get('/getDocInfo', (req, res, next) => {
+// 搜索视频
+router.get('/searchVideo', (req, res, next) => {
+  console.log('req.body:', req.body)
   console.log('req.query:', req.query);
-  let sql =`SELECT * FROM document_list
-  WHERE path = '${req.query.search}'`;
-  console.log('/api/getDocInfo sql:', sql);
+  let sql =`SELECT * FROM video_list
+  WHERE  LOWER(name) LIKE LOWER('%${req.query.search}%')`;
+  console.log('/api/searchVideo sql:', sql);
   console.log();
   connection.query(sql, (err, results) =>{
     if(err){
-      console.log('/api/getDocInfo err:', err);
+      console.log('/api/searchVideo err:', err);
       return res.status(500).json({
         code: 500,
         message: '获取数据失败'
@@ -120,16 +120,16 @@ router.get('/getDocInfo', (req, res, next) => {
 });
 
 // 修改点击量
-router.post('/updateCountNum', (req, res, next) => {
+router.post('/updateVideoCountNum', (req, res, next) => {
   console.log('req.body:', req.body)
-  let sql =`UPDATE document_list
+  let sql =`UPDATE video_list
   SET count_num = count_num + 1
   WHERE name = '${req.body.name}'`;
-  console.log('/api/updateCountNum sql:', sql);
+  console.log('/api/updateVideoCountNum sql:', sql);
   console.log();
   connection.query(sql, (err, results) =>{
     if(err){
-      console.log('/api/updateCountNum err:', err);
+      console.log('/api/updateVideoCountNum err:', err);
       return res.status(500).json({
         code: 500,
         message: '更新数据失败'
@@ -145,16 +145,17 @@ router.post('/updateCountNum', (req, res, next) => {
   });
 });
 
-// 获取文档目录
-router.post('/getDocSectionList', (req, res, next) => {
+// 获取视频目录
+router.post('/getVideoSectionList', (req, res, next) => {
   console.log('req.body:', req.body)
-  let sql =`SELECT * FROM document_section_list
-  WHERE LOWER(document_name) = LOWER('${req.body.document_name}')`;
-  console.log('/api/getDocSectionList sql:', sql);
+  let sql =`SELECT * FROM video_section_list
+  WHERE LOWER(video_name) = LOWER('${req.body.video_name}')
+  ORDER BY section_key`;
+  console.log('/api/getVideoSectionList sql:', sql);
   console.log();
   connection.query(sql, (err, results) =>{
     if(err){
-      console.log('/api/getDocSectionList err:', err);
+      console.log('/api/getVideoSectionList err:', err);
       return res.status(500).json({
         code: 500,
         message: '获取数据失败'
@@ -178,17 +179,17 @@ router.post('/getDocSectionList', (req, res, next) => {
   });
 });
 
-// 获取当前章节信息
-router.post('/getCurrSectionInfo', (req, res, next) => {
+// 获取当前播放视频信息
+router.post('/getCurrVideoInfo', (req, res, next) => {
   console.log('req.body:', req.body)
-  let sql =`SELECT * FROM document_section_list
-  WHERE document_name = '${req.body[0]}'
+  let sql =`SELECT * FROM video_section_list
+  WHERE video_name = '${req.body[0]}'
   AND section_id = '${req.body[1]}'`;
-  console.log('/api/getCurrSectionInfo sql:', sql);
+  console.log('/api/getCurrVideoInfo sql:', sql);
   console.log();
   connection.query(sql, (err, results) =>{
     if(err){
-      console.log('/api/getCurrSectionInfo err:', err);
+      console.log('/api/getCurrVideoInfo err:', err);
       return res.status(500).json({
         code: 500,
         message: '获取数据失败'
@@ -215,10 +216,17 @@ router.post('/getCurrSectionInfo', (req, res, next) => {
 var pathParentDir = path.resolve(__dirname, '..');
 var prePath = path.join(pathParentDir, 'public');
 
+var serverPath = 'http://127.0.0.1:8186/';
 // 获取章节文件
-router.post('/getDocumentSection', (req, res, next) => {
-  const pathStr = req.body.params.fileKey[0] + "\\" + req.body.params.fileKey[1] + "\\" + req.body.params.fileKey[2];
-  res.sendFile(prePath + "\\" + pathStr + ".html");
+router.post('/downloadVideo', (req, res, next) => {
+  const pathStr = req.body.params.fileKey[0] + "/" + req.body.params.fileKey[1] + "/" + req.body.params.fileKey[2];
+  const downloadLink = serverPath + pathStr + '.mp4'
+  res.status(200).json ({
+    code: 200,
+    data: downloadLink,
+    message: '下载链接获取成功'
+  });
+  res.end();
 });
 
 module.exports = router;
