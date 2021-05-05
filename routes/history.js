@@ -46,4 +46,61 @@ router.post('/addHistory', (req, res, next) => {
   });
 });
 
+// 获取用户书签列表
+router.post('/userHistory', (req, res, next) => {
+  const sql =`SELECT * FROM history_list WHERE user_id = '${req.body.user_id}'`;
+  console.log('/api/userHistory 获取用户书签列表请求参数', req.body);
+  console.log('/api/userHistory sql:', sql);
+  console.log();
+  connection.query(sql,(err, results) =>{
+    if(err){
+      console.log('/api/userHistory  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '服务器获取数据失败'
+      });
+    };
+    if (results.length > 0) {
+      res.status(200).json ({
+        code: 200,
+        data: results,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json ({
+        code: 200,
+        data: results,
+        message: '暂无书签历史'
+      });
+      res.end();
+    };
+  });
+});
+
+// 删除书签
+router.post('/delHistory', (req, res, next) => {
+  const sql =`DELETE FROM history_list WHERE user_id = '${req.body.user_id}'
+  AND history_title = '${req.body.history_title}' AND history_time = '${req.body.history_time}'`;
+  console.log('/api/delHistory  获取用户书签列表请求参数', req.body);
+  console.log('/api/delHistory  sql:', sql);
+  console.log();
+  connection.query(sql,(err, results) =>{
+    if(err){
+      console.log('/api/delHistory  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '删除失败'
+      });
+    };
+    if (results) {
+      console.log("/api/delHistory  DELETE Result:", results);
+      return res.status(200).json({
+        code: 200,
+        message: '删除成功'
+      });
+    };
+  });
+});
+
 module.exports = router;

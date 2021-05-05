@@ -11,19 +11,19 @@ router.use(cors());
 var mysql_connection = require('../sql/sql');
 var connection = mysql_connection.mysql_connection
 
-/* Video page api. */
+/* Ebook page api. */
 
-// 获取视频数据列表
-router.post('/getVideoList', (req, res, next) => {
+// 获取电子书数据列表
+router.post('/getEbookList', (req, res, next) => {
   console.log(req.body)
-  const sql =`SELECT COUNT(*) FROM video_list;
-  SELECT * FROM video_list
+  const sql =`SELECT COUNT(*) FROM ebook_list;
+  SELECT * FROM ebook_list
   LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
-  console.log('/api/getVideoList  sql:', sql);
+  console.log('/api/getEbookList  sql:', sql);
   console.log();
   connection.query(sql, (err, results) =>{
     if(err){
-      console.log('/api/getVideoList  err:', err);
+      console.log('/api/getEbookList  err:', err);
       return res.status(500).json({
         code: 500,
         message: '获取数据失败'
@@ -53,16 +53,16 @@ router.post('/getVideoList', (req, res, next) => {
   });
 });
 
-// 获取视频信息
-router.get('/getVideoInfo', (req, res, next) => {
+// 获取电子书信息
+router.get('/getEbookInfo', (req, res, next) => {
   console.log('req.query:', req.query);
-  let sql =`SELECT * FROM video_list
+  let sql =`SELECT * FROM ebook_list
   WHERE path = '${req.query.search}'`;
-  console.log('/api/getVideoInfo sql:', sql);
+  console.log('/api/getEbookInfo sql:', sql);
   console.log();
   connection.query(sql, (err, results) =>{
     if(err){
-      console.log('/api/getVideoInfo err:', err);
+      console.log('/api/getEbookInfo err:', err);
       return res.status(500).json({
         code: 500,
         message: '获取数据失败'
@@ -86,17 +86,17 @@ router.get('/getVideoInfo', (req, res, next) => {
   });
 });
 
-// 搜索视频
-router.get('/searchVideo', (req, res, next) => {
+// 搜索电子书
+router.get('/searchEbook', (req, res, next) => {
   console.log('req.body:', req.body)
   console.log('req.query:', req.query);
-  let sql =`SELECT * FROM video_list
+  let sql =`SELECT * FROM ebook_list
   WHERE  LOWER(name) LIKE LOWER('%${req.query.search}%')`;
-  console.log('/api/searchVideo sql:', sql);
+  console.log('/api/searchEbook sql:', sql);
   console.log();
   connection.query(sql, (err, results) =>{
     if(err){
-      console.log('/api/searchVideo err:', err);
+      console.log('/api/searchEbook err:', err);
       return res.status(500).json({
         code: 500,
         message: '获取数据失败'
@@ -121,16 +121,16 @@ router.get('/searchVideo', (req, res, next) => {
 });
 
 // 修改点击量
-router.post('/updateVideoCountNum', (req, res, next) => {
+router.post('/updateEbookCountNum', (req, res, next) => {
   console.log('req.body:', req.body)
-  let sql =`UPDATE video_list
+  let sql =`UPDATE ebook_list
   SET count_num = count_num + 1
   WHERE name = '${req.body.name}'`;
-  console.log('/api/updateVideoCountNum sql:', sql);
+  console.log('/api/updateEbookCountNum sql:', sql);
   console.log();
   connection.query(sql, (err, results) =>{
     if(err){
-      console.log('/api/updateVideoCountNum err:', err);
+      console.log('/api/updateEbookCountNum err:', err);
       return res.status(500).json({
         code: 500,
         message: '更新数据失败'
@@ -146,105 +146,60 @@ router.post('/updateVideoCountNum', (req, res, next) => {
   });
 });
 
-// 获取视频目录
-router.post('/getVideoSectionList', (req, res, next) => {
-  console.log('req.body:', req.body)
-  let sql =`SELECT * FROM video_section_list
-  WHERE LOWER(video_name) = LOWER('${req.body.video_name}')
-  ORDER BY section_key`;
-  console.log('/api/getVideoSectionList sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
-    if(err){
-      console.log('/api/getVideoSectionList err:', err);
-      return res.status(500).json({
-        code: 500,
-        message: '获取数据失败'
-      });
-    };
-    if (results.length > 0) {
-      res.status(200).json ({
-        code: 200,
-        data: results,
-        message: '获取数据成功'
-      });
-      res.end();
-    } else {
-      res.status(200).json ({
-        code: 200,
-        data: results,
-        message: '暂无数据'
-      });
-      res.end();
-    };
-  });
-});
-
-// 获取当前播放视频信息
-router.post('/getCurrVideoInfo', (req, res, next) => {
-  console.log('req.body:', req.body)
-  let sql =`SELECT * FROM video_section_list
-  WHERE video_name = '${req.body[0]}'
-  AND section_id = '${req.body[1]}'`;
-  console.log('/api/getCurrVideoInfo sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
-    if(err){
-      console.log('/api/getCurrVideoInfo err:', err);
-      return res.status(500).json({
-        code: 500,
-        message: '获取数据失败'
-      });
-    };
-    if (results.length > 0) {
-      res.status(200).json ({
-        code: 200,
-        data: results,
-        message: '获取数据成功'
-      });
-      res.end();
-    } else {
-      res.status(200).json ({
-        code: 200,
-        data: results,
-        message: '暂无数据'
-      });
-      res.end();
-    };
-  });
-});
-
 var pathParentDir = path.resolve(__dirname, '..');
 var prePath = path.join(pathParentDir, 'public');
 
 var serverPath = 'http://127.0.0.1:8186/';
-// 获取章节文件
-router.post('/downloadVideo', (req, res, next) => {
+// 获取电子书pdf文件进行阅读
+router.post('/getEbookUrl', (req, res, next) => {
   const pathStr = req.body.params.fileKey.join('/');
-  const mp4File = prePath + '/' + pathStr + '.mp4';
-  const flvFile = prePath + '/' + pathStr + '.flv';
-  fs.exists(mp4File, (exists) => {
+  var pathFile = prePath + '/' + pathStr + '.pdf';
+  fs.exists(pathFile, (exists) => {
     if (exists) {
-      console.log("mp4文件存在");
-      const mp4Link = serverPath + pathStr + '.mp4';
-      res.status(200).json ({
+      console.log(pathFile, "此格式资源文件存在");
+      const ebookLink = serverPath + pathStr + '.pdf'
+	  res.status(200).json ({
+	    code: 200,
+	    data: ebookLink,
+	    message: '链接获取成功'
+	  });
+	  res.end();
+    } else {
+      console.log("暂无此格式资源");
+	  res.status(200).json ({
         code: 200,
-        type: 'mp4',
-        data: mp4Link,
-        message: '下载链接获取成功'
+        data: '',
+        message: '获取资源失败'
       });
       res.end();
     }
   });
-  fs.exists(flvFile, (exists) => {
+});
+
+// 根据类型获取文件
+router.post('/getSourceByType', (req, res, next) => {
+  console.log('/getSourceByType', req.body);
+  const suffix = req.body[3];
+  const arr = req.body;
+  arr.pop();
+  str = arr.join('/');
+  var pathFile = prePath + '/' + str + '.' + suffix;
+  fs.exists(pathFile, (exists) => {
     if (exists) {
-      console.log("flv文件存在");
-      const flvLink = serverPath + pathStr + '.flv';
+      console.log(pathFile, "此格式资源文件存在");
+      const sourceLink = serverPath + str + '.' + suffix;
       res.status(200).json ({
         code: 200,
-        type: 'flv',
-        data: flvLink,
+        data: sourceLink,
         message: '下载链接获取成功'
+      });
+      res.end();
+    } else {
+      console.log("暂无此格式资源");
+	  res.status(200).json ({
+        code: 200,
+        data: '',
+        message: '暂无此格式资源'
       });
       res.end();
     }
