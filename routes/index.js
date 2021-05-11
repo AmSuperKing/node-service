@@ -12,9 +12,8 @@ var connection = mysql_connection.mysql_connection
 // 获取文档推荐列表
 router.get('/getDocumentRec', (req, res, next) => {
   const sql =`SELECT * FROM document_list ORDER BY RAND() LIMIT 6`;
-  console.log('/api/getDocumentRec  sql:', sql);
-  console.log();
-  connection.query(sql,(err, results) =>{
+  // console.log('/api/getDocumentRec  sql:', sql);
+  connection.query(sql,(err, results) => {
     if(err){
       console.log('/api/getDocumentRec  err:', err);
       return res.status(500).json({
@@ -23,14 +22,14 @@ router.get('/getDocumentRec', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -43,9 +42,8 @@ router.get('/getDocumentRec', (req, res, next) => {
 // 获取视频推荐列表
 router.get('/getVideoRec', (req, res, next) => {
   const sql =`SELECT * FROM video_list ORDER BY RAND() LIMIT 3`;
-  console.log('/api/getVideoRec  sql:', sql);
-  console.log();
-  connection.query(sql,(err, results) =>{
+  // console.log('/api/getVideoRec  sql:', sql);
+  connection.query(sql,(err, results) => {
     if(err){
       console.log('/api/getVideoRec  err:', err);
       return res.status(500).json({
@@ -54,14 +52,14 @@ router.get('/getVideoRec', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -74,9 +72,8 @@ router.get('/getVideoRec', (req, res, next) => {
 // 获取电子书推荐列表
 router.get('/getEbookRec', (req, res, next) => {
   const sql =`SELECT * FROM ebook_list ORDER BY RAND() LIMIT 4`;
-  console.log('/api/getEbookRec sql:', sql);
-  console.log();
-  connection.query(sql,(err, results) =>{
+  // console.log('/api/getEbookRec sql:', sql);
+  connection.query(sql,(err, results) => {
     if(err){
       console.log('/api/getEbookRec  err:', err);
       return res.status(500).json({
@@ -85,14 +82,14 @@ router.get('/getEbookRec', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -105,9 +102,8 @@ router.get('/getEbookRec', (req, res, next) => {
 // 获取课程推荐列表
 router.get('/getCourseRec', (req, res, next) => {
   const sql =`SELECT * FROM course_list ORDER BY RAND() LIMIT 2`;
-  console.log('/api/getCourseRec  sql:', sql);
-  console.log();
-  connection.query(sql,(err, results) =>{
+  // console.log('/api/getCourseRec  sql:', sql);
+  connection.query(sql,(err, results) => {
     if(err){
       console.log('/api/getCourseRec  err:', err);
       return res.status(500).json({
@@ -116,14 +112,14 @@ router.get('/getCourseRec', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -138,9 +134,8 @@ router.get('/getCarouselRec', (req, res, next) => {
   const sql =`SELECT * FROM document_list ORDER BY RAND() LIMIT 1;
   SELECT * FROM video_list ORDER BY RAND() LIMIT 1;
   SELECT * FROM course_list ORDER BY RAND() LIMIT 1;`;
-  console.log('/api/getCarouselRec sql:', sql);
-  console.log();
-  connection.query(sql,(err, results) =>{
+  // console.log('/api/getCarouselRec sql:', sql);
+  connection.query(sql,(err, results) => {
     if(err){
       console.log('/api/getCarouselRec  err:', err);
       return res.status(500).json({
@@ -156,7 +151,7 @@ router.get('/getCarouselRec', (req, res, next) => {
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'

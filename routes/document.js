@@ -14,14 +14,13 @@ var connection = mysql_connection.mysql_connection
 
 // 获取文档数据列表
 router.post('/getDocumentList', (req, res, next) => {
-  console.log(req.body)
+  // console.log(req.body)
   const sql =`SELECT COUNT(*) FROM document_list;
   SELECT * FROM document_list
   LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
-  console.log('/api/getDocumentList  sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
-    if(err){
+  // console.log('/api/getDocumentList  sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
       console.log('/api/getDocumentList  err:', err);
       return res.status(500).json({
         code: 500,
@@ -35,14 +34,14 @@ router.post('/getDocumentList', (req, res, next) => {
       }
       listData.total = results[0][0]['COUNT(*)']
       listData.data = results[1]
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: listData,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -54,13 +53,12 @@ router.post('/getDocumentList', (req, res, next) => {
 
 // 搜索文档
 router.get('/searchDocument', (req, res, next) => {
-  console.log('req.body:', req.body)
-  console.log('req.query:', req.query);
+  // console.log('req.body:', req.body)
+  // console.log('req.query:', req.query);
   let sql =`SELECT * FROM document_list
   WHERE  LOWER(name) LIKE LOWER('%${req.query.search}%')`;
-  console.log('/api/searchDocument sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/searchDocument sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/searchDocument err:', err);
       return res.status(500).json({
@@ -69,14 +67,14 @@ router.get('/searchDocument', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -88,12 +86,11 @@ router.get('/searchDocument', (req, res, next) => {
 
 // 获取文档信息
 router.get('/getDocInfo', (req, res, next) => {
-  console.log('req.query:', req.query);
+  // console.log('req.query:', req.query);
   let sql =`SELECT * FROM document_list
   WHERE path = '${req.query.search}'`;
-  console.log('/api/getDocInfo sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/getDocInfo sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/getDocInfo err:', err);
       return res.status(500).json({
@@ -102,14 +99,14 @@ router.get('/getDocInfo', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -121,13 +118,12 @@ router.get('/getDocInfo', (req, res, next) => {
 
 // 修改点击量
 router.post('/updateCountNum', (req, res, next) => {
-  console.log('req.body:', req.body)
+  // console.log('req.body:', req.body);
   let sql =`UPDATE document_list
   SET count_num = count_num + 1
   WHERE name = '${req.body.name}'`;
-  console.log('/api/updateCountNum sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/updateCountNum sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/updateCountNum err:', err);
       return res.status(500).json({
@@ -136,7 +132,7 @@ router.post('/updateCountNum', (req, res, next) => {
       });
     };
     if(results.affectedRows) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         message: '更新数据成功'
       });
@@ -147,12 +143,11 @@ router.post('/updateCountNum', (req, res, next) => {
 
 // 获取文档目录
 router.post('/getDocSectionList', (req, res, next) => {
-  console.log('req.body:', req.body)
+  // console.log('req.body:', req.body);
   let sql =`SELECT * FROM document_section_list
   WHERE LOWER(document_name) = LOWER('${req.body.document_name}')`;
-  console.log('/api/getDocSectionList sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/getDocSectionList sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/getDocSectionList err:', err);
       return res.status(500).json({
@@ -161,14 +156,14 @@ router.post('/getDocSectionList', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -180,13 +175,12 @@ router.post('/getDocSectionList', (req, res, next) => {
 
 // 获取当前章节信息
 router.post('/getCurrSectionInfo', (req, res, next) => {
-  console.log('req.body:', req.body)
+  // console.log('req.body:', req.body);
   let sql =`SELECT * FROM document_section_list
   WHERE document_name = '${req.body[0]}'
   AND section_id = '${req.body[1]}'`;
-  console.log('/api/getCurrSectionInfo sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/getCurrSectionInfo sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/getCurrSectionInfo err:', err);
       return res.status(500).json({
@@ -195,14 +189,14 @@ router.post('/getCurrSectionInfo', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'

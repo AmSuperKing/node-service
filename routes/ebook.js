@@ -15,13 +15,12 @@ var connection = mysql_connection.mysql_connection
 
 // 获取电子书数据列表
 router.post('/getEbookList', (req, res, next) => {
-  console.log(req.body)
+  // console.log(req.body)
   const sql =`SELECT COUNT(*) FROM ebook_list;
   SELECT * FROM ebook_list
   LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
-  console.log('/api/getEbookList  sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/getEbookList  sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/getEbookList  err:', err);
       return res.status(500).json({
@@ -36,14 +35,14 @@ router.post('/getEbookList', (req, res, next) => {
       }
       listData.total = results[0][0]['COUNT(*)']
       listData.data = results[1]
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: listData,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -55,12 +54,11 @@ router.post('/getEbookList', (req, res, next) => {
 
 // 获取电子书信息
 router.get('/getEbookInfo', (req, res, next) => {
-  console.log('req.query:', req.query);
+  // console.log('req.query:', req.query);
   let sql =`SELECT * FROM ebook_list
   WHERE path = '${req.query.search}'`;
-  console.log('/api/getEbookInfo sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/getEbookInfo sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/getEbookInfo err:', err);
       return res.status(500).json({
@@ -69,14 +67,14 @@ router.get('/getEbookInfo', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -88,13 +86,12 @@ router.get('/getEbookInfo', (req, res, next) => {
 
 // 搜索电子书
 router.get('/searchEbook', (req, res, next) => {
-  console.log('req.body:', req.body)
-  console.log('req.query:', req.query);
+  // console.log('req.body:', req.body)
+  // console.log('req.query:', req.query);
   let sql =`SELECT * FROM ebook_list
   WHERE  LOWER(name) LIKE LOWER('%${req.query.search}%')`;
-  console.log('/api/searchEbook sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/searchEbook sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/searchEbook err:', err);
       return res.status(500).json({
@@ -103,14 +100,14 @@ router.get('/searchEbook', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -122,13 +119,12 @@ router.get('/searchEbook', (req, res, next) => {
 
 // 修改点击量
 router.post('/updateEbookCountNum', (req, res, next) => {
-  console.log('req.body:', req.body)
+  // console.log('req.body:', req.body);
   let sql =`UPDATE ebook_list
   SET count_num = count_num + 1
   WHERE name = '${req.body.name}'`;
-  console.log('/api/updateEbookCountNum sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/updateEbookCountNum sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/updateEbookCountNum err:', err);
       return res.status(500).json({
@@ -137,7 +133,7 @@ router.post('/updateEbookCountNum', (req, res, next) => {
       });
     };
     if(results.affectedRows) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         message: '更新数据成功'
       });
@@ -156,17 +152,17 @@ router.post('/getEbookUrl', (req, res, next) => {
   var pathFile = prePath + '/' + pathStr + '.pdf';
   fs.exists(pathFile, (exists) => {
     if (exists) {
-      console.log(pathFile, "此格式资源文件存在");
+      // console.log(pathFile, "此格式资源文件存在");
       const ebookLink = serverPath + pathStr + '.pdf'
-	  res.status(200).json ({
-	    code: 200,
-	    data: ebookLink,
-	    message: '链接获取成功'
-	  });
-	  res.end();
+  	  res.status(200).json({
+  	    code: 200,
+  	    data: ebookLink,
+  	    message: '链接获取成功'
+  	  });
+  	  res.end();
     } else {
-      console.log("暂无此格式资源");
-	  res.status(200).json ({
+      // console.log("暂无此格式资源");
+	    res.status(200).json({
         code: 200,
         data: '',
         message: '获取资源失败'
@@ -178,7 +174,7 @@ router.post('/getEbookUrl', (req, res, next) => {
 
 // 根据类型获取文件
 router.post('/getSourceByType', (req, res, next) => {
-  console.log('/getSourceByType', req.body);
+  // console.log('/getSourceByType', req.body);
   const suffix = req.body[3];
   const arr = req.body;
   arr.pop();
@@ -186,17 +182,17 @@ router.post('/getSourceByType', (req, res, next) => {
   var pathFile = prePath + '/' + str + '.' + suffix;
   fs.exists(pathFile, (exists) => {
     if (exists) {
-      console.log(pathFile, "此格式资源文件存在");
+      // console.log(pathFile, "此格式资源文件存在");
       const sourceLink = serverPath + str + '.' + suffix;
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: sourceLink,
         message: '下载链接获取成功'
       });
       res.end();
     } else {
-      console.log("暂无此格式资源");
-	  res.status(200).json ({
+      // console.log("暂无此格式资源");
+	  res.status(200).json({
         code: 200,
         data: '',
         message: '暂无此格式资源'

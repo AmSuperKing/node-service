@@ -17,10 +17,9 @@ router.post('/addHistory', (req, res, next) => {
   // usertable为表名
   const inset_sql =`INSERT IGNORE INTO history_list(history_title,history_time,user_id,history_path)
   VALUES ('${req.body.title}','${req.body.time}','${req.body.id}','${req.body.path}')`;
-  console.log('/api/addHistory 参数', req.body);
-  console.log('/api/addHistory sql:', inset_sql);
-  console.log();
-  connection.query(inset_sql,(err, result) =>{
+  // console.log('/api/addHistory 参数', req.body);
+  // console.log('/api/addHistory sql:', inset_sql);
+  connection.query(inset_sql,(err, result) => {
     if(err){
       console.log('/api/addHistory err.message:', err.message);
       return res.status(500).json({
@@ -28,15 +27,15 @@ router.post('/addHistory', (req, res, next) => {
         message: '服务器错误'
       });
     } else {
-      console.log('insert result.affectedRows:', result.affectedRows);
+      // console.log('insert result.affectedRows:', result.affectedRows);
       if (result.affectedRows) {
-        res.status(200).json ({
+        res.status(200).json({
           code: 200,
           message: '添加成功'
         });
         res.end();
       } else {
-        res.status(200).json ({
+        res.status(200).json({
           code: 0,
           message: '记录已存在'
         });
@@ -49,10 +48,9 @@ router.post('/addHistory', (req, res, next) => {
 // 获取用户书签列表
 router.post('/userHistory', (req, res, next) => {
   const sql =`SELECT * FROM history_list WHERE user_id = '${req.body.user_id}'`;
-  console.log('/api/userHistory 获取用户书签列表请求参数', req.body);
-  console.log('/api/userHistory sql:', sql);
-  console.log();
-  connection.query(sql,(err, results) =>{
+  // console.log('/api/userHistory 获取用户书签列表请求参数', req.body);
+  // console.log('/api/userHistory sql:', sql);
+  connection.query(sql,(err, results) => {
     if(err){
       console.log('/api/userHistory  err:', err);
       return res.status(500).json({
@@ -61,14 +59,14 @@ router.post('/userHistory', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无书签历史'
@@ -82,10 +80,9 @@ router.post('/userHistory', (req, res, next) => {
 router.post('/delHistory', (req, res, next) => {
   const sql =`DELETE FROM history_list WHERE user_id = '${req.body.user_id}'
   AND history_title = '${req.body.history_title}' AND history_time = '${req.body.history_time}'`;
-  console.log('/api/delHistory  获取用户书签列表请求参数', req.body);
-  console.log('/api/delHistory  sql:', sql);
-  console.log();
-  connection.query(sql,(err, results) =>{
+  // console.log('/api/delHistory  获取用户书签列表请求参数', req.body);
+  // console.log('/api/delHistory  sql:', sql);
+  connection.query(sql,(err, results) => {
     if(err){
       console.log('/api/delHistory  err:', err);
       return res.status(500).json({
@@ -94,7 +91,7 @@ router.post('/delHistory', (req, res, next) => {
       });
     };
     if (results) {
-      console.log("/api/delHistory  DELETE Result:", results);
+      // console.log("/api/delHistory  DELETE Result:", results);
       return res.status(200).json({
         code: 200,
         message: '删除成功'

@@ -15,13 +15,12 @@ var connection = mysql_connection.mysql_connection
 
 // 获取视频数据列表
 router.post('/getVideoList', (req, res, next) => {
-  console.log(req.body)
+  // console.log(req.body);
   const sql =`SELECT COUNT(*) FROM video_list;
   SELECT * FROM video_list
   LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
-  console.log('/api/getVideoList  sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/getVideoList  sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/getVideoList  err:', err);
       return res.status(500).json({
@@ -36,14 +35,14 @@ router.post('/getVideoList', (req, res, next) => {
       }
       listData.total = results[0][0]['COUNT(*)']
       listData.data = results[1]
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: listData,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -55,12 +54,11 @@ router.post('/getVideoList', (req, res, next) => {
 
 // 获取视频信息
 router.get('/getVideoInfo', (req, res, next) => {
-  console.log('req.query:', req.query);
+  // console.log('req.query:', req.query);
   let sql =`SELECT * FROM video_list
   WHERE path = '${req.query.search}'`;
-  console.log('/api/getVideoInfo sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/getVideoInfo sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/getVideoInfo err:', err);
       return res.status(500).json({
@@ -69,14 +67,14 @@ router.get('/getVideoInfo', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -88,13 +86,12 @@ router.get('/getVideoInfo', (req, res, next) => {
 
 // 搜索视频
 router.get('/searchVideo', (req, res, next) => {
-  console.log('req.body:', req.body)
-  console.log('req.query:', req.query);
+  // console.log('req.body:', req.body)
+  // console.log('req.query:', req.query);
   let sql =`SELECT * FROM video_list
   WHERE  LOWER(name) LIKE LOWER('%${req.query.search}%')`;
-  console.log('/api/searchVideo sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/searchVideo sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/searchVideo err:', err);
       return res.status(500).json({
@@ -103,14 +100,14 @@ router.get('/searchVideo', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -122,13 +119,12 @@ router.get('/searchVideo', (req, res, next) => {
 
 // 修改点击量
 router.post('/updateVideoCountNum', (req, res, next) => {
-  console.log('req.body:', req.body)
+  // console.log('req.body:', req.body)
   let sql =`UPDATE video_list
   SET count_num = count_num + 1
   WHERE name = '${req.body.name}'`;
-  console.log('/api/updateVideoCountNum sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/updateVideoCountNum sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/updateVideoCountNum err:', err);
       return res.status(500).json({
@@ -137,7 +133,7 @@ router.post('/updateVideoCountNum', (req, res, next) => {
       });
     };
     if(results.affectedRows) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         message: '更新数据成功'
       });
@@ -148,13 +144,12 @@ router.post('/updateVideoCountNum', (req, res, next) => {
 
 // 获取视频目录
 router.post('/getVideoSectionList', (req, res, next) => {
-  console.log('req.body:', req.body)
+  // console.log('req.body:', req.body)
   let sql =`SELECT * FROM video_section_list
   WHERE LOWER(video_name) = LOWER('${req.body.video_name}')
   ORDER BY section_key`;
-  console.log('/api/getVideoSectionList sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/getVideoSectionList sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/getVideoSectionList err:', err);
       return res.status(500).json({
@@ -163,14 +158,14 @@ router.post('/getVideoSectionList', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -182,13 +177,12 @@ router.post('/getVideoSectionList', (req, res, next) => {
 
 // 获取当前播放视频信息
 router.post('/getCurrVideoInfo', (req, res, next) => {
-  console.log('req.body:', req.body)
+  // console.log('req.body:', req.body)
   let sql =`SELECT * FROM video_section_list
   WHERE video_name = '${req.body[0]}'
   AND section_id = '${req.body[1]}'`;
-  console.log('/api/getCurrVideoInfo sql:', sql);
-  console.log();
-  connection.query(sql, (err, results) =>{
+  // console.log('/api/getCurrVideoInfo sql:', sql);
+  connection.query(sql, (err, results) => {
     if(err){
       console.log('/api/getCurrVideoInfo err:', err);
       return res.status(500).json({
@@ -197,14 +191,14 @@ router.post('/getCurrVideoInfo', (req, res, next) => {
       });
     };
     if (results.length > 0) {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '获取数据成功'
       });
       res.end();
     } else {
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         data: results,
         message: '暂无数据'
@@ -225,9 +219,9 @@ router.post('/downloadVideo', (req, res, next) => {
   const flvFile = prePath + '/' + pathStr + '.flv';
   fs.exists(mp4File, (exists) => {
     if (exists) {
-      console.log("mp4文件存在");
+      // console.log("mp4文件存在");
       const mp4Link = serverPath + pathStr + '.mp4';
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         type: 'mp4',
         data: mp4Link,
@@ -238,9 +232,9 @@ router.post('/downloadVideo', (req, res, next) => {
   });
   fs.exists(flvFile, (exists) => {
     if (exists) {
-      console.log("flv文件存在");
+      // console.log("flv文件存在");
       const flvLink = serverPath + pathStr + '.flv';
-      res.status(200).json ({
+      res.status(200).json({
         code: 200,
         type: 'flv',
         data: flvLink,
