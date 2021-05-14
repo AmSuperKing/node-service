@@ -134,6 +134,108 @@ router.post('/getMyCourseList', (req, res, next) => {
   });
 });
 
+// 获取创建的课程数据列表
+router.post('/getAllCourseList', (req, res, next) => {
+  // console.log(req.body);
+  const sql =`SELECT COUNT(*) FROM course_list;
+  SELECT * FROM course_list
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
+  // console.log('/api/getAllCourseList  sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/getAllCourseList  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    let listData = {
+      total: 0,
+      data: []
+    }
+    if (results[0][0]['COUNT(*)'] > 0) {
+      listData.total = results[0][0]['COUNT(*)']
+      listData.data = results[1]
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
+// 获取用户创建的全部课程数据列表，不分页
+router.post('/getMyAllCourse', (req, res, next) => {
+  // console.log(req.body);
+  const sql =`SELECT * FROM course_list
+  WHERE creator = '${req.body.user}'`;
+  // console.log('/api/getMyAllCourse  sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/getMyAllCourse  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    if (results.length > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
+// 获取用户创建的全部课程数据列表，不分页
+router.post('/getUserAllCourse', (req, res, next) => {
+  // console.log(req.body);
+  const sql =`SELECT * FROM course_list`;
+  // console.log('/api/getUserAllCourse  sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/getUserAllCourse  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    if (results.length > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
 // 获取课程信息
 router.get('/getCourseInfo', (req, res, next) => {
   // console.log('req.query:', req.query);
@@ -516,33 +618,64 @@ var pathParentDir = path.resolve(__dirname, '..');
 var prePath = path.join(pathParentDir, 'public');
 
 var serverPath = 'http://127.0.0.1:8186/';
-// 获取章节文件
-router.post('/downloadCourse', (req, res, next) => {
-  const pathStr = req.body.params.fileKey.join('/');
-  const mp4File = prePath + '/' + pathStr + '.mp4';
-  const flvFile = prePath + '/' + pathStr + '.flv';
-  fs.exists(mp4File, (exists) => {
-    if (exists) {
-      // console.log("mp4文件存在");
-      const mp4Link = serverPath + pathStr + '.mp4';
+
+// 修改课程信息
+router.post('/updateCourseInfo', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  let sql =`UPDATE course_list
+  SET name = '${req.body.name}', describe_text = '${req.body.desc}'
+  WHERE path = '${req.body.path}';`;
+  // console.log('/api/updateCourseInfo sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/updateCourseInfo err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '更新数据失败'
+      });
+    };
+    if(results.affectedRows) {
       res.status(200).json({
         code: 200,
-        type: 'mp4',
-        data: mp4Link,
-        message: '下载链接获取成功'
+        message: '更新数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 100,
+        message: '更新数据失败'
       });
       res.end();
     }
   });
-  fs.exists(flvFile, (exists) => {
-    if (exists) {
-      // console.log("flv文件存在");
-      const flvLink = serverPath + pathStr + '.flv';
+});
+
+// 删除课程
+router.post('/delCourse', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  let sql =`DELETE FROM course_join_list WHERE path = '${req.body.path}';
+  DELETE FROM course_resource WHERE name = '${req.body.path}';
+  DELETE FROM course_list WHERE path = '${req.body.path}';`;
+  // console.log('/api/delCourse sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/delCourse err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '删除数据失败'
+      });
+    };
+    console.log(results)
+    if(results[2].affectedRows) {
       res.status(200).json({
         code: 200,
-        type: 'flv',
-        data: flvLink,
-        message: '下载链接获取成功'
+        message: '删除数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 100,
+        message: '删除数据失败'
       });
       res.end();
     }

@@ -142,6 +142,182 @@ router.post('/updateEbookCountNum', (req, res, next) => {
   });
 });
 
+// 获取创建的电子书列表
+router.post('/getMyEbookList', (req, res, next) => {
+  // console.log(req.body);
+  const sql =`SELECT COUNT(*) FROM ebook_list
+  WHERE creator = '${req.body.user}';
+  SELECT * FROM ebook_list
+  WHERE creator = '${req.body.user}'
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
+  // console.log('/api/getMyEbookList  sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/getMyEbookList  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    let listData = {
+      total: 0,
+      data: []
+    }
+    if (results[0][0]['COUNT(*)'] > 0) {
+      listData.total = results[0][0]['COUNT(*)']
+      listData.data = results[1]
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
+// 获取创建的电子书列表
+router.post('/getAllEbookList', (req, res, next) => {
+  // console.log(req.body);
+  const sql =`SELECT COUNT(*) FROM ebook_list;
+  SELECT * FROM ebook_list
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
+  // console.log('/api/getAllEbookList  sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/getAllEbookList  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    let listData = {
+      total: 0,
+      data: []
+    }
+    if (results[0][0]['COUNT(*)'] > 0) {
+      listData.total = results[0][0]['COUNT(*)']
+      listData.data = results[1]
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
+// 删除电子书
+router.post('/delEbook', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  let sql =`DELETE FROM ebook_list
+  WHERE path = '${req.body.path}'
+  AND creator = '${req.body.creator}';`;
+  // console.log('/api/delEbook sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/delEbook err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '删除数据失败'
+      });
+    };
+    console.log(results.affectedRows)
+    if(results.affectedRows > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '删除视频教程成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 100,
+        message: '删除视频教程失败'
+      });
+      res.end();
+    }
+  });
+});
+
+// 删除电子书
+router.post('/delAllEbook', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  let sql =`DELETE FROM ebook_list
+  WHERE path = '${req.body.path}'`;
+  // console.log('/api/delAllEbook sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/delAllEbook err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '删除数据失败'
+      });
+    };
+    console.log(results.affectedRows)
+    if(results.affectedRows > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '删除视频教程成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 100,
+        message: '删除视频教程失败'
+      });
+      res.end();
+    }
+  });
+});
+
+// 修改电子书信息
+router.post('/updateEbookInfo', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  let sql =`UPDATE ebook_list
+  SET name = '${req.body.name}', describe_text = '${req.body.desc}'
+  WHERE path = '${req.body.path}';`;
+  // console.log('/api/updateEbookInfo sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/updateEbookInfo err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '更新数据失败'
+      });
+    };
+    if(results.affectedRows) {
+      res.status(200).json({
+        code: 200,
+        message: '更新数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 100,
+        message: '更新数据失败'
+      });
+      res.end();
+    }
+  });
+});
+
 var pathParentDir = path.resolve(__dirname, '..');
 var prePath = path.join(pathParentDir, 'public');
 

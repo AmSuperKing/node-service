@@ -100,4 +100,35 @@ router.post('/delHistory', (req, res, next) => {
   });
 });
 
+// 获取所有书签列表
+router.post('/allHistory', (req, res, next) => {
+  const sql =`SELECT * FROM history_list WHERE user_id = '${req.body.user_id}'`;
+  // console.log('/api/userHistory 获取用户书签列表请求参数', req.body);
+  // console.log('/api/userHistory sql:', sql);
+  connection.query(sql,(err, results) => {
+    if(err){
+      console.log('/api/userHistory  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '服务器获取数据失败'
+      });
+    };
+    if (results.length > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '暂无书签历史'
+      });
+      res.end();
+    };
+  });
+});
+
 module.exports = router;

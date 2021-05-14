@@ -193,4 +193,224 @@ router.post('/searchQuestion', (req, res, next) => {
   });
 });
 
+
+// 获取所有问题数据列表
+router.post('/getAllQueList', (req, res, next) => {
+  // console.log(req.body);
+  const sql =`SELECT COUNT(*) FROM question_list;
+  SELECT * FROM question_list
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
+  // console.log('/api/getAllQueList  sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/getAllQueList  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    let listData = {
+      total: 0,
+      data: []
+    }
+    if (results[0][0]['COUNT(*)'] > 0) {
+      listData.total = results[0][0]['COUNT(*)']
+      listData.data = results[1]
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
+// 用户中心页搜索问题
+router.post('/searchQueByKey', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  // console.log('req.query:', req.query);
+  let sql = '';
+  if(req.body.title) {
+    sql = `SELECT * FROM question_list
+    WHERE LOWER(question_title) LIKE LOWER('%${req.body.title}%')`;
+  } else if(req.body.userName) {
+    sql = `SELECT * FROM question_list
+    WHERE LOWER(create_userName) LIKE LOWER('%${req.body.userName}%')`;
+  }
+  // console.log('/api/searchQueByKey sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err){
+      console.log('/api/searchQueByKey err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    if (results.length > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
+// 删除问题
+router.post('/delQue', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  let sql =`DELETE FROM answer_list WHERE question_id = '${req.body.question_id}';
+  DELETE FROM question_list WHERE question_id = '${req.body.question_id}';`;
+  // console.log('/api/delQue sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/delQue err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '操作数据失败'
+      });
+    };
+    console.log(results[1].affectedRows)
+    if(results[1].affectedRows > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '删除成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 100,
+        message: '删除失败'
+      });
+      res.end();
+    }
+  });
+});
+
+// 获取所有回答数据列表
+router.post('/getAllAnsList', (req, res, next) => {
+  // console.log(req.body);
+  const sql =`SELECT COUNT(*) FROM answer_list;
+  SELECT * FROM answer_list
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
+  // console.log('/api/getAllAnsList  sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/getAllAnsList  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    let listData = {
+      total: 0,
+      data: []
+    }
+    if (results[0][0]['COUNT(*)'] > 0) {
+      listData.total = results[0][0]['COUNT(*)']
+      listData.data = results[1]
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
+// 用户中心页搜索回答
+router.post('/searchAnsByKey', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  // console.log('req.query:', req.query);
+  let sql = '';
+  if(req.body.content) {
+    sql = `SELECT * FROM answer_list
+    WHERE LOWER(answer_content) LIKE LOWER('%${req.body.content}%')`;
+  } else if(req.body.userName) {
+    sql = `SELECT * FROM answer_list
+    WHERE LOWER(answer_userName) LIKE LOWER('%${req.body.userName}%')`;
+  }
+  // console.log('/api/searchAnsByKey sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err){
+      console.log('/api/searchAnsByKey err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    if (results.length > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
+// 删除回答
+router.post('/delAns', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  let sql =`DELETE FROM answer_list WHERE question_id = '${req.body.question_id}';`;
+  // console.log('/api/delAns sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/delAns err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '操作数据失败'
+      });
+    };
+    console.log(results.affectedRows)
+    if(results.affectedRows > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '删除成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 100,
+        message: '删除失败'
+      });
+      res.end();
+    }
+  });
+});
+
 module.exports = router;

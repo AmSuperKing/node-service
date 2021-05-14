@@ -206,6 +206,139 @@ router.post('/getCurrSectionInfo', (req, res, next) => {
   });
 });
 
+// 修改文档信息
+router.post('/updateDocInfo', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  let sql =`UPDATE document_list
+  SET name = '${req.body.name}', describe_text = '${req.body.desc}'
+  WHERE path = '${req.body.path}';`;
+  // console.log('/api/updateDocInfo sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/updateDocInfo err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '更新数据失败'
+      });
+    };
+    if(results.affectedRows) {
+      res.status(200).json({
+        code: 200,
+        message: '更新数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 100,
+        message: '更新数据失败'
+      });
+      res.end();
+    }
+  });
+});
+
+// 删除文档
+router.post('/delDoc', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  let sql =`DELETE FROM document_section_list WHERE document_name = '${req.body.path}';
+  DELETE FROM document_list WHERE path = '${req.body.path}';`;
+  // console.log('/api/delDoc sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/delDoc err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '操作数据失败'
+      });
+    };
+    console.log(results[1].affectedRows)
+    if(results[1].affectedRows > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '删除文档教程成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 100,
+        message: '删除文档教程失败'
+      });
+      res.end();
+    }
+  });
+});
+
+// 获取所有文档教程列表
+router.post('/getAllDocSecList', (req, res, next) => {
+  // console.log(req.body);
+  const sql =`SELECT COUNT(*) FROM document_section_list;
+  SELECT * FROM document_section_list
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
+  // console.log('/api/getAllDocSecList  sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/getAllDocSecList  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    let listData = {
+      total: 0,
+      data: []
+    }
+    if (results[0][0]['COUNT(*)'] > 0) {
+      listData.total = results[0][0]['COUNT(*)']
+      listData.data = results[1]
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: listData,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
+// 删除文档章节
+router.post('/delDocSec', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  let sql =`DELETE FROM document_section_list WHERE section_key = '${req.body.section_key}';`;
+  // console.log('/api/delDocSec sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err) {
+      console.log('/api/delDocSec err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '操作数据失败'
+      });
+    };
+    console.log(results.affectedRows)
+    if(results.affectedRows > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '删除文档教程成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 100,
+        message: '删除文档教程失败'
+      });
+      res.end();
+    }
+  });
+});
+
 var pathParentDir = path.resolve(__dirname, '..');
 var prePath = path.join(pathParentDir, 'public');
 

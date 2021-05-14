@@ -18,6 +18,7 @@ var ebook = require('./routes/ebook');
 var about = require('./routes/about');
 var course = require('./routes/course');
 var discuss = require('./routes/discuss');
+var userCenter = require('./routes/userCenter')
 
 const fileRouter = require('./routes/fileRouter');
 
@@ -40,7 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/upload', fileRouter);
 app.use('/', homeRouter);
-app.use('/api', user, index, documentRouter, video, history, ebook, about, course, discuss);
+app.use('/api', user, index, documentRouter, video, history, ebook, about, course, discuss, userCenter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
