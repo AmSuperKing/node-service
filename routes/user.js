@@ -83,6 +83,35 @@ router.post('/getUserName', (req, res, next) => {
   });
 });
 
+// 获取用户名称
+router.post('/searchRole', (req, res, next) => {
+  const sql =`SELECT user_role FROM usertable WHERE user_id = '${req.body.user_id}'`;
+  connection.query(sql,(err, results) => {
+    if(err){
+      console.log('/api/searchRole  err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '服务器获取数据出错'
+      });
+    };
+    if (results.length > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results[0],
+        message: '获取用户角色成功'
+      });
+      res.end();
+    } else {
+      res.status(500).json({
+        code: 500,
+        data: [],
+        message: '未能正确获取用户数据'
+      });
+      res.end();
+    };
+  });
+});
+
 // 注册
 router.post('/userRegister', (req, res, next) => {
   let userName = req.body.account;

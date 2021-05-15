@@ -144,9 +144,23 @@ router.get('/getCarouselRec', (req, res, next) => {
       });
     };
     if (results.length > 0) {
+      // console.log('/getCarouselRec', results)
+      let recData = [{
+          type: 'document',
+          data: results[0][0]
+        },
+        {
+          type: 'videos',
+          data: results[1][0]
+        },
+        {
+          type: 'course',
+          data: results[2][0]
+        }
+      ];
       res.status(200).json({
         code: 200,
-        data: results,
+        data: recData,
         message: '获取数据成功'
       });
       res.end();
