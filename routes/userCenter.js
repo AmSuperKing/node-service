@@ -85,15 +85,18 @@ router.post('/searchCourseByKey', (req, res, next) => {
   if(req.body.name) {
   	sql = `SELECT * FROM course_list
   	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.describe_text) {
   	sql = `SELECT * FROM course_list
   	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.count_num) {
   	sql = `SELECT * FROM course_list
   	WHERE count_num = ${req.body.count_num}
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchCourseByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -129,13 +132,16 @@ router.post('/searchAllCourseByKey', (req, res, next) => {
   let sql = '';
   if(req.body.name) {
   	sql = `SELECT * FROM course_list
-  	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')`;
+  	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.describe_text) {
   	sql = `SELECT * FROM course_list
-  	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')`;
+  	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.count_num) {
   	sql = `SELECT * FROM course_list
-  	WHERE count_num = ${req.body.count_num}`;
+  	WHERE count_num = ${req.body.count_num}
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchAllCourseByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -168,7 +174,8 @@ router.post('/searchAllCourseByKey', (req, res, next) => {
 router.post('/getCourseFileList', (req, res, next) => {
   // console.log('req.body:', req.body)
   let sql =`SELECT * FROM course_resource
-  WHERE creator = '${req.body.userId}';`;
+  WHERE creator = '${req.body.userId}'
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   // console.log('/api/getCourseFileList sql:', sql);
   connection.query(sql, (err, results) => {
     if(err){
@@ -199,7 +206,8 @@ router.post('/getCourseFileList', (req, res, next) => {
 // 管理员用户中心获取课程资源目录
 router.post('/getAllCourseFileList', (req, res, next) => {
   // console.log('req.body:', req.body)
-  let sql =`SELECT * FROM course_resource`;
+  let sql =`SELECT * FROM course_resource
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   // console.log('/api/getAllCourseFileList sql:', sql);
   connection.query(sql, (err, results) => {
     if(err){
@@ -235,15 +243,18 @@ router.post('/searchFileByKey', (req, res, next) => {
   if(req.body.source_name) {
   	sql = `SELECT * FROM course_resource
   	WHERE LOWER(source_name) LIKE LOWER('%${req.body.source_name}%')
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.source_type) {
   	sql = `SELECT * FROM course_resource
   	WHERE LOWER(source_type) LIKE LOWER('%${req.body.source_type}%')
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.key) {
   	sql = `SELECT * FROM course_resource
   	WHERE name = '${req.body.key}'
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchFileByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -279,13 +290,16 @@ router.post('/searchAllFileByKey', (req, res, next) => {
   let sql = '';
   if(req.body.source_name) {
   	sql = `SELECT * FROM course_resource
-  	WHERE LOWER(source_name) LIKE LOWER('%${req.body.source_name}%')`;
+  	WHERE LOWER(source_name) LIKE LOWER('%${req.body.source_name}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.source_type) {
   	sql = `SELECT * FROM course_resource
-  	WHERE LOWER(source_type) LIKE LOWER('%${req.body.source_type}%')`;
+  	WHERE LOWER(source_type) LIKE LOWER('%${req.body.source_type}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.key) {
   	sql = `SELECT * FROM course_resource
-  	WHERE name = '${req.body.key}'`;
+  	WHERE name = '${req.body.key}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchAllFileByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -380,12 +394,29 @@ router.post('/newCourse', (req, res, next) => {
 // 删除课程文件
 router.post('/delCourseFile', (req, res, next) => {
   // console.log('req.body:', req.body)
-  let sql =`DELETE FROM course_resource
+  let fileArr = req.body.source_path.split('/');
+  let fileLen = fileArr.length;
+  let filePath = fileArr[fileLen - 2] + '/' + fileArr[fileLen - 1];
+  let fileParam = './public/' + fileArr[fileLen - 2] + '/' + fileArr[fileLen - 1];
+  // console.log('fileParam', fileParam);
+  let sql =`
+  DELETE FROM file_url WHERE pathName = '${filePath}';
+  DELETE FROM course_resource
   WHERE name = '${req.body.name}'
   AND source_name = '${req.body.source_name}'
   AND source_type = '${req.body.source_type}'
   AND creator = '${req.body.creator}';`;
-  // console.log('/api/delCourseFile sql:', sql);
+  let delFlg = false;
+  fs.unlink(fileParam, (error) => {
+    if(error) {
+        console.log(error);
+        return false;
+    } else {
+      delFlg = true
+      console.log('删除文件成功');
+    }
+  })
+  console.log('/api/delCourseFile sql:', sql);
   connection.query(sql, (err, results) => {
     if(err) {
       console.log('/api/delCourseFile err:', err);
@@ -395,7 +426,7 @@ router.post('/delCourseFile', (req, res, next) => {
       });
     };
     console.log(results)
-    if(results.affectedRows) {
+    if(results[1].affectedRows && delFlg) {
       res.status(200).json({
         code: 200,
         message: '删除文件成功'
@@ -419,15 +450,18 @@ router.post('/searchVideoByKey', (req, res, next) => {
   if(req.body.name) {
   	sql = `SELECT * FROM video_list
   	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.describe_text) {
   	sql = `SELECT * FROM video_list
   	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.count_num) {
   	sql = `SELECT * FROM video_list
   	WHERE count_num = ${req.body.count_num}
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchVideoByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -463,13 +497,16 @@ router.post('/searchAllVideoByKey', (req, res, next) => {
   let sql = '';
   if(req.body.name) {
   	sql = `SELECT * FROM video_list
-  	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')`;
+  	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.describe_text) {
   	sql = `SELECT * FROM video_list
-  	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')`;
+  	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.count_num) {
   	sql = `SELECT * FROM video_list
-  	WHERE count_num LIKE ${req.body.count_num}`;
+  	WHERE count_num LIKE ${req.body.count_num}
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchAllVideoByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -502,8 +539,10 @@ router.post('/searchAllVideoByKey', (req, res, next) => {
 // 用户中心获取视频教程资源目录
 router.post('/getVideoFileList', (req, res, next) => {
   // console.log('req.body:', req.body)
-  let sql =`SELECT * FROM video_section_list
-  WHERE creator = '${req.body.userId}';`;
+  let sql =` SELECT COUNT(*) FROM video_section_list WHERE creator = '${req.body.userId}';
+  SELECT * FROM video_section_list
+  WHERE creator = '${req.body.userId}'
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   // console.log('/api/getVideoFileList sql:', sql);
   connection.query(sql, (err, results) => {
     if(err){
@@ -513,17 +552,23 @@ router.post('/getVideoFileList', (req, res, next) => {
         message: '获取数据失败'
       });
     };
-    if (results.length > 0) {
+    let listData = {
+      total: 0,
+      data: []
+    };
+    if (results[0][0]['COUNT(*)'] > 0) {
+      listData.total = results[0][0]['COUNT(*)']
+      listData.data = results[1]
       res.status(200).json({
         code: 200,
-        data: results,
+        data: listData,
         message: '获取数据成功'
       });
       res.end();
     } else {
       res.status(200).json({
         code: 200,
-        data: results,
+        data: listData,
         message: '暂无数据'
       });
       res.end();
@@ -534,7 +579,9 @@ router.post('/getVideoFileList', (req, res, next) => {
 // 管理员用户中心获取视频教程资源目录
 router.post('/getAllVideoFileList', (req, res, next) => {
   // console.log('req.body:', req.body)
-  let sql =`SELECT * FROM video_section_list;`;
+  let sql =`SELECT COUNT(*) FROM video_section_list;
+  SELECT * FROM video_section_list
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   // console.log('/api/getAllVideoFileList sql:', sql);
   connection.query(sql, (err, results) => {
     if(err){
@@ -544,17 +591,23 @@ router.post('/getAllVideoFileList', (req, res, next) => {
         message: '获取数据失败'
       });
     };
-    if (results.length > 0) {
+    let listData = {
+      total: 0,
+      data: []
+    };
+    if (results[0][0]['COUNT(*)'] > 0) {
+      listData.total = results[0][0]['COUNT(*)']
+      listData.data = results[1]
       res.status(200).json({
         code: 200,
-        data: results,
+        data: listData,
         message: '获取数据成功'
       });
       res.end();
     } else {
       res.status(200).json({
         code: 200,
-        data: results,
+        data: listData,
         message: '暂无数据'
       });
       res.end();
@@ -567,18 +620,21 @@ router.post('/searchVideoFileByKey', (req, res, next) => {
   // console.log('req.body:', req.body)
   // console.log('req.query:', req.query);
   let sql = '';
-  if(req.body.source_name) {
-  	sql = `SELECT * FROM video_resource
-  	WHERE LOWER(source_name) LIKE LOWER('%${req.body.source_name}%')
-  	AND creator = '${req.body.user}'`;
-  } else if(req.body.source_type) {
-  	sql = `SELECT * FROM video_resource
-  	WHERE LOWER(source_type) LIKE LOWER('%${req.body.source_type}%')
-  	AND creator = '${req.body.user}'`;
-  } else if(req.body.key) {
-  	sql = `SELECT * FROM video_resource
-  	WHERE name = '${req.body.key}'
-  	AND creator = '${req.body.user}'`;
+  if(req.body.video_name) {
+  	sql = `SELECT * FROM video_section_list
+  	WHERE LOWER(video_name) LIKE LOWER('%${req.body.video_name}%')
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
+  } else if(req.body.section_id) {
+  	sql = `SELECT * FROM video_section_list
+  	WHERE LOWER(section_id) LIKE LOWER('%${req.body.section_id}%')
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
+  } else if(req.body.section_title) {
+  	sql = `SELECT * FROM video_section_list
+  	WHERE section_title = '${req.body.section_title}'
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchVideoFileByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -606,6 +662,52 @@ router.post('/searchVideoFileByKey', (req, res, next) => {
     };
   });
 });
+
+// 用户中心页搜索视频文件
+router.post('/searchAllVideoFileByKey', (req, res, next) => {
+  // console.log('req.body:', req.body)
+  // console.log('req.query:', req.query);
+  let sql = '';
+  if(req.body.video_name) {
+  	sql = `SELECT * FROM video_section_list
+  	WHERE LOWER(video_name) LIKE LOWER('%${req.body.video_name}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
+  } else if(req.body.section_id) {
+  	sql = `SELECT * FROM video_section_list
+  	WHERE LOWER(section_id) LIKE LOWER('%${req.body.section_id}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
+  } else if(req.body.section_title) {
+  	sql = `SELECT * FROM video_section_list
+  	WHERE section_title = '${req.body.section_title}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
+  }
+  // console.log('/api/searchAllVideoFileByKey sql:', sql);
+  connection.query(sql, (err, results) => {
+    if(err){
+      console.log('/api/searchAllVideoFileByKey err:', err);
+      return res.status(500).json({
+        code: 500,
+        message: '获取数据失败'
+      });
+    };
+    if (results.length > 0) {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '获取数据成功'
+      });
+      res.end();
+    } else {
+      res.status(200).json({
+        code: 200,
+        data: results,
+        message: '暂无数据'
+      });
+      res.end();
+    };
+  });
+});
+
 
 
 // 用户中心上传视频资源
@@ -673,12 +775,28 @@ router.post('/newVideo', (req, res, next) => {
 // 删除课程文件
 router.post('/delVideoFile', (req, res, next) => {
   // console.log('req.body:', req.body)
-  let sql =`DELETE FROM video_section_list
+  // file
+  let fileArr = req.body.section_key.split('/');
+  let fileLen = fileArr.length;
+  let filePath = fileArr[fileLen - 2] + '/' + fileArr[fileLen - 1];
+  let fileParam = './public/' + fileArr[fileLen - 2] + '/' + fileArr[fileLen - 1];
+  let sql =`DELETE FROM file_url WHERE pathName = '${filePath}';
+  DELETE FROM video_section_list
   WHERE video_name = '${req.body.video_name}'
   AND section_id= '${req.body.section_id}'
   AND section_key = '${req.body.section_key}'
   AND creator = '${req.body.creator}';`;
   // console.log('/api/delVideoFile sql:', sql);
+  let delFlile = false;
+  fs.unlink(fileParam, (error) => {
+    if(error) {
+        console.log(error);
+        return false;
+    } else {
+      delFlile = true
+      console.log('删除文件成功');
+    }
+  })
   connection.query(sql, (err, results) => {
     if(err) {
       console.log('/api/delVideoFile err:', err);
@@ -688,7 +806,7 @@ router.post('/delVideoFile', (req, res, next) => {
       });
     };
     console.log(results)
-    if(results.affectedRows) {
+    if(results[1].affectedRows > 0 && delFlile) {
       res.status(200).json({
         code: 200,
         message: '删除文件成功'
@@ -708,11 +826,27 @@ router.post('/delVideoFile', (req, res, next) => {
 // 删除课程文件
 router.post('/delAllVideoFile', (req, res, next) => {
   // console.log('req.body:', req.body)
-  let sql =`DELETE FROM video_section_list
+  // file
+  let fileArr = req.body.section_key.split('/');
+  let fileLen = fileArr.length;
+  let filePath = fileArr[fileLen - 2] + '/' + fileArr[fileLen - 1];
+  let fileParam = './public/' + fileArr[fileLen - 2] + '/' + fileArr[fileLen - 1];
+  let sql =`DELETE FROM file_url WHERE pathName = '${filePath}';
+  DELETE FROM video_section_list
   WHERE video_name = '${req.body.video_name}'
   AND section_id= '${req.body.section_id}'
   AND section_key = '${req.body.section_key}';`;
   // console.log('/api/delAllVideoFile sql:', sql);
+  let delFlile = false;
+  fs.unlink(fileParam, (error) => {
+    if(error) {
+        console.log(error);
+        return false;
+    } else {
+      delFlile = true
+      console.log('删除文件成功');
+    }
+  })
   connection.query(sql, (err, results) => {
     if(err) {
       console.log('/api/delAllVideoFile err:', err);
@@ -722,7 +856,7 @@ router.post('/delAllVideoFile', (req, res, next) => {
       });
     };
     console.log(results)
-    if(results.affectedRows) {
+    if(results[1].affectedRows > 0 && delFlile) {
       res.status(200).json({
         code: 200,
         message: '删除文件成功'
@@ -746,15 +880,18 @@ router.post('/searchEbookByKey', (req, res, next) => {
   if(req.body.name) {
   	sql = `SELECT * FROM ebook_list
   	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.describe_text) {
   	sql = `SELECT * FROM ebook_list
   	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.count_num) {
   	sql = `SELECT * FROM ebook_list
   	WHERE count_num = ${req.body.count_num}
-  	AND creator = '${req.body.user}'`;
+  	AND creator = '${req.body.user}'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchEbookByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -790,13 +927,16 @@ router.post('/searchAllEbookByKey', (req, res, next) => {
   let sql = '';
   if(req.body.name) {
   	sql = `SELECT * FROM ebook_list
-  	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')`;
+  	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.describe_text) {
   	sql = `SELECT * FROM ebook_list
-  	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')`;
+  	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.count_num) {
   	sql = `SELECT * FROM ebook_list
-  	WHERE count_num like ${req.body.count_num}`;
+  	WHERE count_num like ${req.body.count_num}
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchAllEbookByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -905,12 +1045,15 @@ router.post('/searchUserByKey', (req, res, next) => {
   let sql = '';
   if(req.body.user_id) {
   	sql = `SELECT * FROM usertable
-  	WHERE LOWER(user_id) LIKE LOWER('%${req.body.user_id}%')`;
+  	WHERE LOWER(user_id) LIKE LOWER('%${req.body.user_id}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.user_name) {
   	sql = `SELECT * FROM usertable
-  	WHERE LOWER(user_name) LIKE LOWER('%${req.body.user_name}%')`;
+  	WHERE LOWER(user_name) LIKE LOWER('%${req.body.user_name}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.password) {
-  	sql = `SELECT * FROM usertable WHERE password LIKE '%${req.body.password}%'`;
+  	sql = `SELECT * FROM usertable WHERE password LIKE '%${req.body.password}%'
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchUserByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -986,13 +1129,16 @@ router.post('/searchDocByKey', (req, res, next) => {
   let sql = '';
   if(req.body.name) {
   	sql = `SELECT * FROM document_list
-  	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')`;
+  	WHERE LOWER(name) LIKE LOWER('%${req.body.name}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.describe_text) {
   	sql = `SELECT * FROM document_list
-  	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')`;
+  	WHERE LOWER(describe_text) LIKE LOWER('%${req.body.describe_text}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.count_num) {
   	sql = `SELECT * FROM document_list
-  	WHERE count_num = ${req.body.count_num}`;
+  	WHERE count_num = ${req.body.count_num}
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchDocByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -1028,13 +1174,16 @@ router.post('/searchDocSecByKey', (req, res, next) => {
   let sql = '';
   if(req.body.document_name) {
   	sql = `SELECT * FROM document_section_list
-  	WHERE LOWER(document_name) LIKE LOWER('%${req.body.document_name}%')`;
+  	WHERE LOWER(document_name) LIKE LOWER('%${req.body.document_name}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.section_title) {
   	sql = `SELECT * FROM document_section_list
-  	WHERE LOWER(section_title) LIKE LOWER('%${req.body.section_title}%')`;
+  	WHERE LOWER(section_title) LIKE LOWER('%${req.body.section_title}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.section_id) {
   	sql = `SELECT * FROM document_section_list
-  	WHERE LOWER(section_id) LIKE LOWER('%${req.body.section_id}%')`;
+  	WHERE LOWER(section_id) LIKE LOWER('%${req.body.section_id}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchDocSecByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -1141,13 +1290,16 @@ router.post('/searchAppealByKey', (req, res, next) => {
   let sql = '';
   if(req.body.user_name) {
     sql = `SELECT * FROM appeal_list
-    WHERE LOWER(user_name) LIKE LOWER('%${req.body.user_name}%')`;
+    WHERE LOWER(user_name) LIKE LOWER('%${req.body.user_name}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.appeal_title) {
     sql = `SELECT * FROM appeal_list
-    WHERE LOWER(appeal_title) LIKE LOWER('%${req.body.appeal_title}%')`;
+    WHERE LOWER(appeal_title) LIKE LOWER('%${req.body.appeal_title}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.appeal_desc) {
   	sql = `SELECT * FROM appeal_list
-    WHERE LOWER(appeal_desc) LIKE LOWER('%${req.body.appeal_desc}%')`;
+    WHERE LOWER(appeal_desc) LIKE LOWER('%${req.body.appeal_desc}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchAppealByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -1257,10 +1409,12 @@ router.post('/searchHistoryByKey', (req, res, next) => {
   let sql = '';
   if(req.body.history_title) {
     sql = `SELECT * FROM history_list
-    WHERE LOWER(history_title) LIKE LOWER('%${req.body.history_title}%')`;
+    WHERE LOWER(history_title) LIKE LOWER('%${req.body.history_title}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.user_id) {
     sql = `SELECT * FROM history_list
-    WHERE LOWER(user_id) LIKE LOWER('%${req.body.user_id}%')`;
+    WHERE LOWER(user_id) LIKE LOWER('%${req.body.user_id}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchHistoryByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -1369,10 +1523,12 @@ router.post('/searchAdviceByKey', (req, res, next) => {
   let sql = '';
   if(req.body.adviceContent) {
     sql = `SELECT * FROM advice_list
-    WHERE LOWER(adviceContent) LIKE LOWER('%${req.body.adviceContent}%')`;
+    WHERE LOWER(adviceContent) LIKE LOWER('%${req.body.adviceContent}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.adviceContact) {
     sql = `SELECT * FROM advice_list
-    WHERE LOWER(adviceContact) LIKE LOWER('%${req.body.adviceContact}%')`;
+    WHERE LOWER(adviceContact) LIKE LOWER('%${req.body.adviceContact}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchAdviceByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -1480,13 +1636,16 @@ router.post('/searchCorrectByKey', (req, res, next) => {
   let sql = '';
   if(req.body.correctTitle) {
     sql = `SELECT * FROM correct_list
-    WHERE LOWER(correctTitle) LIKE LOWER('%${req.body.correctTitle}%')`;
+    WHERE LOWER(correctTitle) LIKE LOWER('%${req.body.correctTitle}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.correctSection) {
     sql = `SELECT * FROM correct_list
-    WHERE LOWER(correctSection) LIKE LOWER('%${req.body.correctSection}%')`;
+    WHERE LOWER(correctSection) LIKE LOWER('%${req.body.correctSection}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.correctContent) {
     sql = `SELECT * FROM correct_list
-    WHERE LOWER(correctContent) LIKE LOWER('%${req.body.correctContent}%')`;
+    WHERE LOWER(correctContent) LIKE LOWER('%${req.body.correctContent}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchCorrectByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -1594,13 +1753,16 @@ router.post('/searchProtectByKey', (req, res, next) => {
   let sql = '';
   if(req.body.protectTitle) {
     sql = `SELECT * FROM protect_list
-    WHERE LOWER(protectTitle) LIKE LOWER('%${req.body.protectTitle}%')`;
+    WHERE LOWER(protectTitle) LIKE LOWER('%${req.body.protectTitle}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.protectSection) {
     sql = `SELECT * FROM protect_list
-    WHERE LOWER(protectSection) LIKE LOWER('%${req.body.protectSection}%')`;
+    WHERE LOWER(protectSection) LIKE LOWER('%${req.body.protectSection}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.protectContent) {
     sql = `SELECT * FROM protect_list
-    WHERE LOWER(protectContent) LIKE LOWER('%${req.body.protectContent}%')`;
+    WHERE LOWER(protectContent) LIKE LOWER('%${req.body.protectContent}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchProtectByKey sql:', sql);
   connection.query(sql, (err, results) => {

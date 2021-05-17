@@ -188,7 +188,7 @@ router.post('/getAllEbookList', (req, res, next) => {
   // console.log(req.body);
   const sql =`SELECT COUNT(*) FROM ebook_list;
   SELECT * FROM ebook_list
-  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize}`;
+  LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   // console.log('/api/getAllEbookList  sql:', sql);
   connection.query(sql, (err, results) => {
     if(err) {
@@ -225,10 +225,43 @@ router.post('/getAllEbookList', (req, res, next) => {
 // 删除电子书
 router.post('/delEbook', (req, res, next) => {
   // console.log('req.body:', req.body)
-  let sql =`DELETE FROM ebook_list
+  // file
+  let fileArr = req.body.file_url.split('/');
+  let fileLen = fileArr.length;
+  let filePath = fileArr[fileLen - 2] + '/' + fileArr[fileLen - 1];
+  let fileParam = './public/' + fileArr[fileLen - 2] + '/' + fileArr[fileLen - 1];
+  // img
+  let imgArr = req.body.imgUrl.split('/');
+  let imgLen = imgArr.length;
+  let imgPath = imgArr[imgLen -2] + '/' + imgArr[imgLen -1];
+  let imgParam = './public/' + imgArr[imgLen -2] + '/' + imgArr[imgLen -1];
+  // sql
+  let sql =`DELETE FROM file_url WHERE pathName = '${imgPath}';
+  DELETE FROM file_url WHERE pathName = '${filePath}';
+  DELETE FROM ebook_list
   WHERE path = '${req.body.path}'
   AND creator = '${req.body.creator}';`;
   // console.log('/api/delEbook sql:', sql);
+  let delFlile = false;
+  let delImg = false;
+  fs.unlink(imgParam, (error) => {
+    if(error) {
+        console.log(error);
+        return false;
+    } else {
+      delImg = true
+      console.log('删除书籍封面成功');
+    }
+  })
+  fs.unlink(fileParam, (error) => {
+    if(error) {
+        console.log(error);
+        return false;
+    } else {
+      delFlile = true
+      console.log('删除书籍文件成功');
+    }
+  })
   connection.query(sql, (err, results) => {
     if(err) {
       console.log('/api/delEbook err:', err);
@@ -238,17 +271,17 @@ router.post('/delEbook', (req, res, next) => {
       });
     };
     console.log(results.affectedRows)
-    if(results.affectedRows > 0) {
+    if(results[2].affectedRows > 0 && delFlile && delImg) {
       res.status(200).json({
         code: 200,
         data: results,
-        message: '删除视频教程成功'
+        message: '删除电子书籍成功'
       });
       res.end();
     } else {
       res.status(200).json({
         code: 100,
-        message: '删除视频教程失败'
+        message: '删除电子书籍失败'
       });
       res.end();
     }
@@ -258,9 +291,44 @@ router.post('/delEbook', (req, res, next) => {
 // 删除电子书
 router.post('/delAllEbook', (req, res, next) => {
   // console.log('req.body:', req.body)
-  let sql =`DELETE FROM ebook_list
+  // file
+  let fileArr = req.body.file_url.split('/');
+  let fileLen = fileArr.length;
+  let filePath = fileArr[fileLen - 2] + '/' + fileArr[fileLen - 1];
+  let fileParam = './public/' + fileArr[fileLen - 2] + '/' + fileArr[fileLen - 1];
+  // console.log('fileParam', fileParam);
+  // img
+  let imgArr = req.body.imgUrl.split('/');
+  let imgLen = imgArr.length;
+  let imgPath = imgArr[imgLen -2] + '/' + imgArr[imgLen -1];
+  let imgParam = './public/' + imgArr[imgLen -2] + '/' + imgArr[imgLen -1];
+  // console.log('imgParam', imgParam);
+  // sql
+  let sql =`DELETE FROM file_url WHERE pathName = '${imgPath}';
+  DELETE FROM file_url WHERE pathName = '${filePath}';
+  DELETE FROM ebook_list
   WHERE path = '${req.body.path}'`;
   // console.log('/api/delAllEbook sql:', sql);
+  let delFlg = false;
+  let delImg = false;
+  fs.unlink(imgParam, (error) => {
+    if(error) {
+        console.log(error);
+        return false;
+    } else {
+      delImg = true
+      console.log('删除书籍封面成功');
+    }
+  })
+  fs.unlink(fileParam, (error) => {
+    if(error) {
+        console.log(error);
+        return false;
+    } else {
+      delFlg = true
+      console.log('删除书籍文件成功');
+    }
+  })
   connection.query(sql, (err, results) => {
     if(err) {
       console.log('/api/delAllEbook err:', err);
@@ -270,17 +338,17 @@ router.post('/delAllEbook', (req, res, next) => {
       });
     };
     console.log(results.affectedRows)
-    if(results.affectedRows > 0) {
+    if(results[2].affectedRows > 0 && delFlg && delImg) {
       res.status(200).json({
         code: 200,
         data: results,
-        message: '删除视频教程成功'
+        message: '删除电子书籍成功'
       });
       res.end();
     } else {
       res.status(200).json({
         code: 100,
-        message: '删除视频教程失败'
+        message: '删除电子书籍失败'
       });
       res.end();
     }

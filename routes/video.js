@@ -416,9 +416,24 @@ router.post('/updateAllVideoInfo', (req, res, next) => {
 // 删除视频
 router.post('/delVideo', (req, res, next) => {
   // console.log('req.body:', req.body)
+  // img
+  let imgArr = req.body.imgUrl.split('/');
+  let imgLen = imgArr.length;
+  let imgPath = imgArr[imgLen -2] + '/' + imgArr[imgLen -1];
+  let imgParam = './public/' + imgArr[imgLen -2] + '/' + imgArr[imgLen -1];
   let sql =`DELETE FROM video_section_list WHERE video_name = '${req.body.path}';
-  DELETE FROM video_list WHERE path = '${req.body.path}';`;
+  DELETE FROM video_list WHERE path = '${req.body.path}';
+  DELETE FROM file_url WHERE pathName = '${imgPath}';`;
   // console.log('/api/delVideo sql:', sql);
+  fs.unlink(imgParam, (error) => {
+    if(error) {
+        console.log(error);
+        return false;
+    } else {
+      delImg = true
+      console.log('删除文件成功');
+    }
+  })
   connection.query(sql, (err, results) => {
     if(err) {
       console.log('/api/delVideo err:', err);

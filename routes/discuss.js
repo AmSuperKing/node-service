@@ -240,10 +240,12 @@ router.post('/searchQueByKey', (req, res, next) => {
   let sql = '';
   if(req.body.title) {
     sql = `SELECT * FROM question_list
-    WHERE LOWER(question_title) LIKE LOWER('%${req.body.title}%')`;
+    WHERE LOWER(question_title) LIKE LOWER('%${req.body.title}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.userName) {
     sql = `SELECT * FROM question_list
-    WHERE LOWER(create_userName) LIKE LOWER('%${req.body.userName}%')`;
+    WHERE LOWER(create_userName) LIKE LOWER('%${req.body.userName}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchQueByKey sql:', sql);
   connection.query(sql, (err, results) => {
@@ -350,10 +352,12 @@ router.post('/searchAnsByKey', (req, res, next) => {
   let sql = '';
   if(req.body.content) {
     sql = `SELECT * FROM answer_list
-    WHERE LOWER(answer_content) LIKE LOWER('%${req.body.content}%')`;
+    WHERE LOWER(answer_content) LIKE LOWER('%${req.body.content}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   } else if(req.body.userName) {
     sql = `SELECT * FROM answer_list
-    WHERE LOWER(answer_userName) LIKE LOWER('%${req.body.userName}%')`;
+    WHERE LOWER(answer_userName) LIKE LOWER('%${req.body.userName}%')
+    LIMIT ${req.body.pageSize} OFFSET ${(req.body.currentPage-1)*req.body.pageSize};`;
   }
   // console.log('/api/searchAnsByKey sql:', sql);
   connection.query(sql, (err, results) => {

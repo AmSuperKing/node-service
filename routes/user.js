@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var cors = require('cors'); // CORS模块，处理web端跨域问题
+// 引入token 
+var vertoken=require('../token/token');
+
 router.use(cors()); 
 
 // 使用mysql中间件连接MySQL数据库
@@ -24,14 +27,20 @@ router.post('/userLogin', function(req, res, next) {
       });
     };
     if (results.length > 0) {
-      // console.log('/api/userLogin', results)
+      console.log('/api/userLogin', results)
       if(results[0].password == req.body.password) {
-        res.status(200).json({
-          code: 200,
-          data: results,
-          message: '登录成功'
-        });
-        res.end();
+        //调用生成token的方法
+        vertoken.setToken(results[0].user_name, results[0].user_id).then(token => {
+          console.log(token)
+          console.log(req.headers.host)
+          res.status(200).json({
+            code: 200,
+            data: results,
+            token: token,
+            message: '登录成功'
+          });
+          res.end();
+        })
       } else {
         res.status(200).json({
           code: 100,
@@ -55,23 +64,37 @@ router.post('/userLogin', function(req, res, next) {
 // 获取用户名称
 router.post('/getUserName', (req, res, next) => {
   const sql =`SELECT user_name FROM usertable WHERE user_id = '${req.body.user_id}'`;
-  // console.log('/api/getUserName 获取用户名称请求参数', req.body);
+  console.log('/api/getUserName 获取用户名称请求参数', req.body);
+  // console.log('/api/getUserName 获取用户名称请求头', req.headers);
   // console.log('/api/getUserName sql:', sql);
-  connection.query(sql,(err, results) => {
-    if(err){
-      console.log('/api/getUserName  err:', err);
-      return res.status(500).json({
-        code: 500,
-        message: '服务器获取数据出错'
+  vertoken.getToken(req.headers.authorization).then(token => {
+    // console.log('getToken:', token)
+    if (token.user_id == req.body.user_id) {
+      console.log('token 验证成功')
+      connection.query(sql,(err, results) => {
+        if(err){
+          console.log('/api/getUserName  err:', err);
+          return res.status(500).json({
+            code: 500,
+            message: '服务器获取数据出错'
+          });
+        };
+        if (results.length > 0) {
+          res.status(200).json({
+            code: 200,
+            data: results,
+            message: '获取用户数据成功'
+          });
+          res.end();
+        } else {
+          res.status(500).json({
+            code: 500,
+            data: [{}],
+            message: '未能正确获取用户数据'
+          });
+          res.end();
+        };
       });
-    };
-    if (results.length > 0) {
-      res.status(200).json({
-        code: 200,
-        data: results,
-        message: '获取用户数据成功'
-      });
-      res.end();
     } else {
       res.status(500).json({
         code: 500,
@@ -79,7 +102,7 @@ router.post('/getUserName', (req, res, next) => {
         message: '未能正确获取用户数据'
       });
       res.end();
-    };
+    }
   });
 });
 

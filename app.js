@@ -8,6 +8,10 @@ var cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 var logger = require('morgan'); // 在控制台中，显示req请求的信息
 
+// 引入插件
+var vertoken = require('./token/token');
+var expressJwt = require('express-jwt');
+
 var homeRouter = require('./routes/home');
 var user = require('./routes/user');
 var index = require('./routes/index');
@@ -42,6 +46,38 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/upload', fileRouter);
 app.use('/', homeRouter);
 app.use('/api', user, index, documentRouter, video, history, ebook, about, course, discuss, userCenter);
+
+//解析token获取用户信息
+app.use(function(req, res, next) {
+  var token = req.headers['authorization'];
+  if(token == undefined) {
+    return next();
+  } else {
+    vertoken.getToken(token).then((data) => {
+      req.data = data;
+      return next();
+    }).catch((error) => {
+      return next();
+    })
+  }
+});
+
+//验证token是否过期并规定那些路由不需要验证
+app.use(expressJwt({
+  secret:'online_learn_token',
+  algorithms:['HS256']
+}).unless({
+  path:['/', '/api', '/upload']  // 不需要验证的接口名称
+}));
+
+// token失效返回信息
+app.use(function(err, req, res, next) {
+  if(err.status == 401) {
+      // return res.status(401).send('token失效')
+      // 可以设置返回json 形式  res.json({message:'token失效'})
+      return res.status(401).json({ message: 'token失效' })
+  }
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
